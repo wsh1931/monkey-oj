@@ -19,12 +19,10 @@
 }
 
 .header {
-  background-color: lightcyan;
-  margin-bottom: 16px;
+  box-shadow: aqua 1px 1px 5px;
 }
 
 .content {
-  background-color: lightblue;
   margin-bottom: 16px;
 }
 
