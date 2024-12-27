@@ -1,5 +1,6 @@
 import { StoreOptions } from "vuex";
 import AUTHORITY_ENUM from "@/authority/authorityEnum";
+import { UserControllerService } from "../../generated";
 
 export default {
   namespaced: true,
@@ -7,7 +8,6 @@ export default {
   state: () => ({
     loginUser: {
       userName: "未登录",
-      userRole: AUTHORITY_ENUM.NOT_LOGIN,
     },
   }),
   // 定义更新变量的方法
@@ -18,9 +18,18 @@ export default {
   },
   // 执行异步，调用mutations的方法
   actions: {
-    getLoginUser({ commit, state }, payload) {
-      // todo 从后端获取登录信息
-      commit("updateUser", payload);
+    async getLoginUser({ commit, state }, payload) {
+      // 从后端获取登录信息
+      const user = await UserControllerService.getLoginUserUsingGet();
+      console.log(user);
+      if (user.code === 0) {
+        commit("updateUser", user.data);
+      } else {
+        commit("updateUser", {
+          ...state.loginUser,
+          userRole: AUTHORITY_ENUM.NOT_LOGIN,
+        });
+      }
     },
   },
 } as StoreOptions<any>;
