@@ -33,15 +33,33 @@
 <script setup lang="ts">
 import { routes } from "@/router/routes";
 import { useRoute, useRouter } from "vue-router";
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { useStore } from "vuex";
+import checkAuthority from "@/authority/checkAuthority";
+import AUTHORITY_ENUM from "@/authority/authorityEnum";
 
 const router = useRouter();
 const route = useRoute();
+const store = useStore();
 
-const visibleRoutes = routes.filter((route) => {
-  if (!route.meta?.hideInMenu) return true;
-  return false;
+// 使用computed是因为当用户信息发生变更时出发页面重新渲染
+const visibleRoutes = computed(() => {
+  return routes.filter((route) => {
+    // 判断是否为隐藏菜单
+    if (route.meta?.hideInMenu) {
+      return false;
+    }
+    // 判断当前用户是否有权限展现菜单。
+    if (
+      !checkAuthority(
+        store.state.user.loginUser,
+        route?.meta?.authority as string
+      )
+    ) {
+      return false;
+    }
+    return true;
+  });
 });
 
 // 路由跳转后
@@ -57,14 +75,12 @@ const menuClick = (key: string) => {
   });
 };
 
-const store = useStore();
-
-// setTimeout(() => {
-//   store.dispatch("user/getLoginUser", {
-//     userName: "已登录",
-//     role: "admin",
-//   });
-// }, 10000);
+setTimeout(() => {
+  store.dispatch("user/getLoginUser", {
+    userName: "已登录",
+    userRole: AUTHORITY_ENUM.ADMIN,
+  });
+}, 1000);
 </script>
 
 <style scoped>

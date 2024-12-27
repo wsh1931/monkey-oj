@@ -1,4 +1,5 @@
 import { StoreOptions } from "vuex";
+import AUTHORITY_ENUM from "@/authority/authorityEnum";
 
 export default {
   namespaced: true,
@@ -6,20 +7,20 @@ export default {
   state: () => ({
     loginUser: {
       userName: "未登录",
-      role: "notLogin",
+      userRole: AUTHORITY_ENUM.NOT_LOGIN,
     },
   }),
   // 定义更新变量的方法
   mutations: {
-    updateUser(state, playload) {
-      state.loginUser = playload;
+    updateUser(state, payload) {
+      state.loginUser = payload;
     },
   },
   // 执行异步，调用mutations的方法
   actions: {
-    getLoginUser({ commit, state }, playload) {
+    getLoginUser({ commit, state }, payload) {
       // todo 从后端获取登录信息
-      commit("updateUser", playload);
+      commit("updateUser", payload);
     },
   },
 } as StoreOptions<any>;
