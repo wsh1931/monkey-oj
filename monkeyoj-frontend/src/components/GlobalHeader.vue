@@ -1,11 +1,6 @@
 <template>
   <div>
-    <a-row
-      id="globalHeader"
-      class="grid-demo"
-      style="margin-bottom: 16px"
-      align="center"
-    >
+    <a-row id="globalHeader" class="grid-demo" align="center" :wrap="false">
       <a-col flex="100px">
         <div>100px</div>
       </a-col>
@@ -22,7 +17,7 @@
                 <div class="title">猴&nbsp;OJ</div>
               </div>
             </a-menu-item>
-            <a-menu-item v-for="route in routes" :key="route.path">
+            <a-menu-item v-for="route in visibleRoutes" :key="route.path">
               {{ route.name }}
             </a-menu-item>
           </a-menu>
@@ -43,6 +38,11 @@ import { useStore } from "vuex";
 
 const router = useRouter();
 const route = useRoute();
+
+const visibleRoutes = routes.filter((route) => {
+  if (!route.meta?.hideInMenu) return true;
+  return false;
+});
 
 // 路由跳转后
 router.afterEach((to, from, failure) => {

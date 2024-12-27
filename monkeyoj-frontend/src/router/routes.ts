@@ -8,8 +8,13 @@ export const routes: Array<RouteRecordRaw> = [
     path: "/",
     name: "问题",
     component: HomeView,
+  },
+  {
+    path: "/hide",
+    name: "隐藏业面",
+    component: HomeView,
     meta: {
-      access: "canAdmin",
+      hideInMenu: true,
     },
   },
   {
