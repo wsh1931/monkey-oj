@@ -6,6 +6,7 @@ export default {
   state: () => ({
     loginUser: {
       userName: "未登录",
+      role: "notLogin",
     },
   }),
   // 定义更新变量的方法

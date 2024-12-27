@@ -59,11 +59,12 @@ const menuClick = (key: string) => {
 
 const store = useStore();
 
-setTimeout(() => {
-  store.dispatch("user/getLoginUser", {
-    userName: "已登录",
-  });
-}, 1000);
+// setTimeout(() => {
+//   store.dispatch("user/getLoginUser", {
+//     userName: "已登录",
+//     role: "admin",
+//   });
+// }, 10000);
 </script>
 
 <style scoped>
