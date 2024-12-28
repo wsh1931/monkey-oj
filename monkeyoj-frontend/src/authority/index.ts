@@ -8,7 +8,7 @@ router.beforeEach(async (to, from, next) => {
   // 没登录实现自动登录
   if (!loginUser || !loginUser.userRole) {
     // 待用户登录成功之后，再执行后面的代码
-    await store.dispatch("/user/getLoginUser");
+    await store.dispatch("user/getLoginUser");
   }
 
   const needAuthority =
