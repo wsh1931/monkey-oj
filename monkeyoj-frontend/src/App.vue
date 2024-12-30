@@ -8,7 +8,7 @@
     </template>
   </div>
 </template>
-<style></style>
+<style scoped></style>
 <script setup lang="ts">
 import BasicLayout from "@/layouts/BasicLayout.vue";
 import { onMounted } from "vue";
