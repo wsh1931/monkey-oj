@@ -19,12 +19,13 @@
 }
 
 .header {
-  box-shadow: aqua 1px 1px 5px;
+  //box-shadow: aqua 1px 1px 5px;
 }
 
 .content {
   margin-bottom: 16px;
   padding: 20px;
+  background-color: #f6f8fa;
 }
 
 .footer {
