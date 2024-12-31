@@ -103,7 +103,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import {reactive, ref} from "vue";
+import { reactive, ref } from "vue";
 import MdEditor from "@/components/MdEditor.vue";
 import {
   QuestionAddRequest,
