@@ -24,10 +24,12 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
-import {Question, QuestionControllerService} from "../../../generated";
+import { Question, QuestionControllerService } from "../../../generated";
 import message from "@arco-design/web-vue/es/message";
+import { useRouter } from "vue-router";
 
 const show = ref(true);
+const router = useRouter();
 
 const dataList = ref([]);
 const searchParams = ref({
@@ -110,11 +112,17 @@ const doDelete = async (question: Question) => {
   });
   if (res.code === 0) {
     message.success("删除成功");
+    loadData();
   } else {
-    message.error("操作失败" + res.message);
+    message.error("操作失败: " + res.message);
   }
 };
 const doUpdate = (question: Question) => {
-  console.log(question);
+  router.push({
+    path: "/question/update",
+    query: {
+      questionId: question.id,
+    },
+  });
 };
 </script>

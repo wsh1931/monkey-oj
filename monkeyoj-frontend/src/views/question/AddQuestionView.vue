@@ -103,21 +103,105 @@
   </div>
 </template>
 <script setup lang="ts">
-import { reactive, ref } from "vue";
+import { onMounted, reactive, ref } from "vue";
 import MdEditor from "@/components/MdEditor.vue";
 import {
   QuestionAddRequest,
   QuestionControllerService,
 } from "../../../generated";
 import message from "@arco-design/web-vue/es/message";
+import { useRoute } from "vue-router";
 
-const form = reactive({
-  answer: "暴力破解",
-  content: "题目内容",
+onMounted(() => {
+  loadData();
+});
+
+const route = useRoute();
+// 判断当前页面是创建页面还是更新页面
+const updatePage = route.path.includes("update");
+const loadData = async () => {
+  const questionId = route.query.questionId;
+  if (!updatePage) {
+    return;
+  }
+  const res = await QuestionControllerService.getQuestionByIdUsingGet(
+    questionId as any
+  );
+  if (res.code === 0) {
+    form.value = res.data as any;
+    if (form.value.judgeCase) {
+      form.value.judgeCase = [];
+    } else {
+      form.value.judgeCase = JSON.parse(form.value.judgeCase);
+    }
+    if (!form.value.judgeConfig) {
+      form.value.judgeConfig = {
+        memoryLimit: 1000,
+        stackLimit: 1000,
+        timeLimit: 1000,
+      };
+    } else {
+      form.value.judgeConfig = JSON.parse(form.value.judgeConfig as any);
+    }
+    if (!form.value.tags) {
+      form.value.tags = [];
+    } else {
+      form.value.tags = JSON.parse(form.value.tags as any);
+    }
+  } else {
+    message.error("加载题目数据失败: " + res.message);
+  }
+};
+
+const handleAdd = () => {
+  form.value.judgeCase.push({
+    input: "",
+    output: "",
+  });
+};
+const handleDelete = (index: number) => {
+  form.value.judgeCase.splice(index, 1);
+};
+
+// 提交表单
+const doSubmit = async () => {
+  const questionId = route.query.questionId;
+  if (updatePage) {
+    const res = await QuestionControllerService.updateQuestionUsingPost(
+      form.value
+    );
+    if (res.code === 0) {
+      message.success("更新题目成功");
+    } else {
+      message.error("更新题目失败: " + res.message);
+    }
+  } else {
+    const res = await QuestionControllerService.addQuestionUsingPost(
+      form.value
+    );
+    if (res.code === 0) {
+      message.success("创建题目成功");
+    } else {
+      message.error("创建题目失败: " + res.message);
+    }
+  }
+};
+
+const onContentChange = (value: string) => {
+  form.value.content = value;
+};
+
+const onAnswerChange = (value: string) => {
+  form.value.answer = value;
+};
+
+let form = ref({
+  answer: "",
+  content: "",
   judgeCase: [
     {
-      input: "1 2",
-      output: "3 4",
+      input: "",
+      output: "",
     },
   ],
   judgeConfig: {
@@ -125,37 +209,9 @@ const form = reactive({
     stackLimit: 1000,
     timeLimit: 1000,
   },
-  tags: ["栈", "简单"],
-  title: "A + B",
+  tags: [],
+  title: "",
 });
-
-const handleAdd = () => {
-  form.judgeCase.push({
-    input: "",
-    output: "",
-  });
-};
-const handleDelete = (index: number) => {
-  form.judgeCase.splice(index, 1);
-};
-
-// 提交表单
-const doSubmit = async () => {
-  const res = await QuestionControllerService.addQuestionUsingPost(form);
-  if (res.code === 0) {
-    message.success("创建题目成功");
-  } else {
-    message.error("创建题目失败: " + res.message);
-  }
-};
-
-const onContentChange = (value: string) => {
-  form.content = value;
-};
-
-const onAnswerChange = (value: string) => {
-  form.answer = value;
-};
 </script>
 
 <style scoped>
