@@ -9,6 +9,7 @@ import UserRegisterView from "@/views/user/UserRegisterView.vue";
 import ExampleView from "@/views/ExampleView.vue";
 import AddQuestionView from "@/views/question/AddQuestionView.vue";
 import ManageQuestionView from "@/views/question/ManageQuestionView.vue";
+import QuestionListView from "@/views/question/QuestionListView.vue";
 
 export const routes: Array<RouteRecordRaw> = [
   {
@@ -31,6 +32,17 @@ export const routes: Array<RouteRecordRaw> = [
       },
     ],
   },
+  {
+    path: "/",
+    name: "主页",
+    component: ExampleView,
+  },
+  {
+    path: "/question/list",
+    name: "题目列表",
+    component: QuestionListView,
+  },
+
   {
     path: "/question/add",
     name: "创建题目",
@@ -55,11 +67,6 @@ export const routes: Array<RouteRecordRaw> = [
       authority: AUTHORITY_ENUM.ADMIN,
       hideInMenu: true,
     },
-  },
-  {
-    path: "/",
-    name: "测试",
-    component: ExampleView,
   },
   // {
   //   path: "/hide",
