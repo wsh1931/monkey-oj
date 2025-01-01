@@ -1,9 +1,7 @@
 <template>
   <div>
     <a-row id="globalHeader" class="grid-demo" align="center" :wrap="false">
-      <a-col flex="100px">
-        <div>100px</div>
-      </a-col>
+      <a-col flex="100px"> </a-col>
       <a-col flex="auto">
         <div>
           <a-menu
@@ -14,7 +12,7 @@
             <a-menu-item key="0">
               <div class="logo-title">
                 <img class="logo" src="../assets/logo.jpg" alt="花果山OJ" />
-                <div class="title">猴&nbsp;OJ</div>
+                <div class="title">花果山</div>
               </div>
             </a-menu-item>
             <a-menu-item v-for="route in visibleRoutes" :key="route.path">

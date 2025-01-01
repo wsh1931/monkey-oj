@@ -4,11 +4,12 @@ import AUTHORITY_ENUM from "@/authority/authorityEnum";
 import checkAuthority from "@/authority/checkAuthority";
 
 router.beforeEach(async (to, from, next) => {
-  const loginUser = store.state.user.loginUser;
+  let loginUser = store.state.user.loginUser;
   // 没登录实现自动登录
   if (!loginUser || !loginUser.userRole) {
     // 待用户登录成功之后，再执行后面的代码
     await store.dispatch("user/getLoginUser");
+    loginUser = store.state.user.loginUser;
   }
 
   const needAuthority =
@@ -16,7 +17,11 @@ router.beforeEach(async (to, from, next) => {
   // 跳转的页面需要登录
   if (needAuthority !== AUTHORITY_ENUM.NOT_LOGIN) {
     // 没登陆则要跳转到登录页面
-    if (!loginUser || !loginUser.userRole) {
+    if (
+      !loginUser ||
+      !loginUser.userRole ||
+      loginUser.userRole === AUTHORITY_ENUM.NOT_LOGIN
+    ) {
       // 若用户登录成功则跳转到to.fullPath页面
       next(`/user/login?redirect=${to.fullPath}`);
       return;

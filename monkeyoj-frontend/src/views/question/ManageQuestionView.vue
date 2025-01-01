@@ -11,6 +11,8 @@
         showTotal: true,
         showPageSize: true,
       }"
+      @page-change="onPageChange"
+      @page-size-change="onPageSizeChange"
     >
       <template #optional="{ record }">
         <a-space>
@@ -23,7 +25,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { onMounted, ref, watchEffect } from "vue";
 import { Question, QuestionControllerService } from "../../../generated";
 import message from "@arco-design/web-vue/es/message";
 import { useRouter } from "vue-router";
@@ -42,6 +44,13 @@ onMounted(() => {
   loadData();
 });
 
+const onPageSizeChange = (pageSize: number) => {
+  searchParams.value = {
+    ...searchParams.value,
+    pageSize: pageSize,
+  };
+};
+
 // 得到题目列表
 const loadData = async () => {
   const res = await QuestionControllerService.listQuestionByPageUsingPost(
@@ -54,6 +63,18 @@ const loadData = async () => {
     message.error("获取题目列表失败: " + res.message);
   }
 };
+
+const onPageChange = (page: number) => {
+  searchParams.value = {
+    ...searchParams.value,
+    current: page,
+  };
+};
+
+// 当loadData里面的数据发生变化时，就触发此行数
+watchEffect(() => {
+  loadData();
+});
 const columns = [
   {
     title: "id",

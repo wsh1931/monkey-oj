@@ -36,55 +36,59 @@ export const routes: Array<RouteRecordRaw> = [
     name: "创建题目",
     component: AddQuestionView,
     meta: {
-      authority: AUTHORITY_ENUM.ADMIN,
+      authority: AUTHORITY_ENUM.USER,
     },
   },
   {
     path: "/question/manage",
     name: "管理题目",
     component: ManageQuestionView,
-    // meta: {
-    //   authority: AUTHORITY_ENUM.ADMIN,
-    // },
+    meta: {
+      authority: AUTHORITY_ENUM.ADMIN,
+    },
   },
   {
     path: "/question/update",
     name: "更新题目",
     component: AddQuestionView,
-    // meta: {
-    //   authority: AUTHORITY_ENUM.ADMIN,
-    // },
+    meta: {
+      authority: AUTHORITY_ENUM.ADMIN,
+      hideInMenu: true,
+    },
   },
   {
     path: "/",
     name: "测试",
     component: ExampleView,
   },
-  {
-    path: "/hide",
-    name: "隐藏业面",
-    component: HomeView,
-    meta: {
-      hideInMenu: true,
-    },
-  },
+  // {
+  //   path: "/hide",
+  //   name: "隐藏业面",
+  //   component: HomeView,
+  //   meta: {
+  //     hideInMenu: true,
+  //   },
+  // },
   {
     path: "/notAuth",
     name: "没有权限",
     component: NotAuthView,
-  },
-  {
-    path: "/admin",
-    name: "管理员可见",
-    component: AdminView,
     meta: {
-      authority: AUTHORITY_ENUM.ADMIN,
+      hideInMenu: true,
     },
   },
-  {
-    path: "/about",
-    name: "about",
-    component: () =>
-      import(/* webpackChunkName: "about" */ "../views/AboutView.vue"),
-  },
+  // {
+  //   path: "/admin",
+  //   name: "管理员可见",
+  //   component: AdminView,
+  //   meta: {
+  //     authority: AUTHORITY_ENUM.ADMIN,
+  //   },
+  // },
+  // {
+  //   path: "/about",
+  //   name: "about",
+  //   component: () =>
+  //     import(/* webpackChunkName: "about" */ "../views/AboutView.vue"),
+  // },
 ];

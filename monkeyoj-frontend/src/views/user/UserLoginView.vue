@@ -19,8 +19,8 @@
       </a-form-item>
       <a-form-itemq>
         <a-button html-type="submit" style="width: 120px" type="primary"
-          >登录</a-button
-        >
+          >登录
+        </a-button>
       </a-form-itemq>
     </a-form>
   </div>

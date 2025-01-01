@@ -4,7 +4,7 @@
       <a-layout-header class="header">
         <a-space
           ><img src="../assets/logo.jpg" alt="" class="logo" />
-          <div>猴 OJ</div>
+          <div>花果山</div>
         </a-space>
       </a-layout-header>
       <a-layout-content class="content">
