@@ -100,4 +100,8 @@ knife4j:
       default:
         api-rule: package
         api-rule-resources:
-          - com.yupi.monkeyoj.controller
+          - com.wusihao.monkeyoj.controller
+
+# 代码沙箱配置
+codesandbox:
+  type: remote

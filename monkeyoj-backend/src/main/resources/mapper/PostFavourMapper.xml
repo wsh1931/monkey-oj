@@ -4,9 +4,9 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.yupi.monkeyoj.mapper.PostFavourMapper">
+<mapper namespace="com.wusihao.monkeyoj.mapper.PostFavourMapper">
 
-    <resultMap id="BaseResultMap" type="com.yupi.monkeyoj.model.entity.PostFavour">
+    <resultMap id="BaseResultMap" type="com.wusihao.monkeyoj.model.entity.PostFavour">
         <id property="id" column="id" jdbcType="BIGINT"/>
         <result property="postId" column="postId" jdbcType="BIGINT"/>
         <result property="userId" column="userId" jdbcType="BIGINT"/>
@@ -20,7 +20,7 @@
     </sql>
 
     <select id="listFavourPostByPage"
-            resultType="com.yupi.monkeyoj.model.entity.Post">
+            resultType="com.wusihao.monkeyoj.model.entity.Post">
         select p.*
         from post p
                  join (select postId from post_favour where userId = #{favourUserId}) pf
