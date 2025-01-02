@@ -1,6 +1,10 @@
 package com.wusihao.monkeyoj.job.judge.codesandbox.model;
 
 import com.wusihao.monkeyoj.model.dto.questionsubmit.JudgeInfo;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
@@ -10,6 +14,10 @@ import java.util.List;
  * @version: 1.0
  * @description:
  */
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ExecuteCodeResponse {
     private List<String> ouputList;
     /**

@@ -1,5 +1,6 @@
 package com.wusihao.monkeyoj.job.judge.codesandbox;
 
+import com.wusihao.monkeyoj.job.judge.CodeSandboxProxy;
 import com.wusihao.monkeyoj.job.judge.codesandbox.impl.ExampleSandboxImpl;
 import com.wusihao.monkeyoj.job.judge.codesandbox.model.ExecuteCodeRequest;
 import com.wusihao.monkeyoj.job.judge.codesandbox.model.ExecuteCodeResponse;
@@ -51,6 +52,22 @@ public class CodeSandboxTest {
                 .inputList(inputList)
                 .build();
         ExecuteCodeResponse executeCodeResponse = codeSandbox.executeCode(executeCodeRequest);
+        Assertions.assertNotNull(executeCodeResponse);
+    }
+
+    @Test
+    void executeCodeByProxy() {
+        CodeSandbox codeSandbox = CodeSandboxFactory.newInstance(type);
+        CodeSandboxProxy codeSandboxProxy = new CodeSandboxProxy(codeSandbox);
+        String code = "int main() {}";
+        String language = QuestionSubmitLanguageEnum.JAVA.getValue();
+        List<String> inputList = Arrays.asList("1 2", "3 4");
+        ExecuteCodeRequest executeCodeRequest = ExecuteCodeRequest.builder()
+                .code(code)
+                .language(language)
+                .inputList(inputList)
+                .build();
+        ExecuteCodeResponse executeCodeResponse = codeSandboxProxy.executeCode(executeCodeRequest);
         Assertions.assertNotNull(executeCodeResponse);
     }
 
