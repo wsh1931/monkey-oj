@@ -1,4 +1,4 @@
-package com.wusihao.monkeyoj.job.judge;
+package com.wusihao.monkeyoj.job.judge.codesandbox;
 
 import com.wusihao.monkeyoj.job.judge.codesandbox.CodeSandbox;
 import com.wusihao.monkeyoj.job.judge.codesandbox.model.ExecuteCodeRequest;

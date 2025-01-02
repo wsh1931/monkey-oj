@@ -19,7 +19,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ExecuteCodeResponse {
-    private List<String> ouputList;
+    private List<String> outputList;
     /**
      * 接口信息
      */

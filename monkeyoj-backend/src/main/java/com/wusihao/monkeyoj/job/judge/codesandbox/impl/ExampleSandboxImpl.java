@@ -21,7 +21,7 @@ public class ExampleSandboxImpl implements CodeSandbox {
         List<String> inputList = executeCodeRequest.getInputList();
         ExecuteCodeResponse executeCodeResponse = new ExecuteCodeResponse();;
 
-        executeCodeResponse.setOuputList(inputList);
+        executeCodeResponse.setOutputList(inputList);
         executeCodeResponse.setMessage("测试成功");
         executeCodeResponse.setStatus(QuestionSubmitStatusEnum.SUCCESS.getValue());
         JudgeInfo judgeInfo = new JudgeInfo();

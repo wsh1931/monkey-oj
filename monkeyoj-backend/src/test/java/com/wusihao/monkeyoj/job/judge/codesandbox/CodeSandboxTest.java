@@ -1,6 +1,5 @@
 package com.wusihao.monkeyoj.job.judge.codesandbox;
 
-import com.wusihao.monkeyoj.job.judge.CodeSandboxProxy;
 import com.wusihao.monkeyoj.job.judge.codesandbox.impl.ExampleSandboxImpl;
 import com.wusihao.monkeyoj.job.judge.codesandbox.model.ExecuteCodeRequest;
 import com.wusihao.monkeyoj.job.judge.codesandbox.model.ExecuteCodeResponse;
