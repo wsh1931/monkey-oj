@@ -10,6 +10,7 @@ import ExampleView from "@/views/ExampleView.vue";
 import AddQuestionView from "@/views/question/AddQuestionView.vue";
 import ManageQuestionView from "@/views/question/ManageQuestionView.vue";
 import QuestionListView from "@/views/question/QuestionListView.vue";
+import QuestionDetailView from "@/views/question/QuestionDetailView.vue";
 
 export const routes: Array<RouteRecordRaw> = [
   {
@@ -49,6 +50,16 @@ export const routes: Array<RouteRecordRaw> = [
     component: AddQuestionView,
     meta: {
       authority: AUTHORITY_ENUM.USER,
+    },
+  },
+  {
+    path: "/question/detail/:questionId",
+    name: "题目详情",
+    props: true,
+    component: QuestionDetailView,
+    meta: {
+      access: AUTHORITY_ENUM.USER,
+      hideInMenu: true,
     },
   },
   {
