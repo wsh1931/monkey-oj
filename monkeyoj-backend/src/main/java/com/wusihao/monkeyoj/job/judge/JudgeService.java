@@ -1,7 +1,7 @@
 package com.wusihao.monkeyoj.job.judge;
 
-import com.wusihao.monkeyoj.model.vo.QuestionSubmitVO;
+import com.wusihao.monkeyoj.model.entity.QuestionSubmit;
 
 public interface JudgeService {
-    QuestionSubmitVO doJudge(long questionSubmitId);
+    QuestionSubmit doJudge(long questionSubmitId);
 }

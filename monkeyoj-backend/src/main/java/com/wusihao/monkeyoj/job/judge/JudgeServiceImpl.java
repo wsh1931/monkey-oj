@@ -8,14 +8,12 @@ import com.wusihao.monkeyoj.job.judge.codesandbox.CodeSandboxFactory;
 import com.wusihao.monkeyoj.job.judge.codesandbox.CodeSandboxProxy;
 import com.wusihao.monkeyoj.job.judge.codesandbox.model.ExecuteCodeRequest;
 import com.wusihao.monkeyoj.job.judge.codesandbox.model.ExecuteCodeResponse;
+import com.wusihao.monkeyoj.job.judge.strategy.JudgeContext;
 import com.wusihao.monkeyoj.model.dto.question.JudgeCase;
-import com.wusihao.monkeyoj.model.dto.question.JudgeConfig;
 import com.wusihao.monkeyoj.model.dto.questionsubmit.JudgeInfo;
 import com.wusihao.monkeyoj.model.entity.Question;
 import com.wusihao.monkeyoj.model.entity.QuestionSubmit;
-import com.wusihao.monkeyoj.model.enums.JudgeInfoMessageEnum;
 import com.wusihao.monkeyoj.model.enums.QuestionSubmitStatusEnum;
-import com.wusihao.monkeyoj.model.vo.QuestionSubmitVO;
 import com.wusihao.monkeyoj.service.QuestionService;
 import com.wusihao.monkeyoj.service.QuestionSubmitService;
 import org.springframework.beans.factory.annotation.Value;
@@ -43,8 +41,11 @@ public class JudgeServiceImpl implements JudgeService {
     @Resource
     private QuestionSubmitService questionSubmitService;
 
+    @Resource
+    private JudgeManager judgeManager;
+
     @Override
-    public QuestionSubmitVO doJudge(long questionSubmitId) {
+    public QuestionSubmit doJudge(long questionSubmitId) {
         // 根据题目提交id得到提交信息，题目信息
         QuestionSubmit questionSubmit = questionSubmitService.getById(questionSubmitId);
         if (questionSubmit == null) {
@@ -89,41 +90,29 @@ public class JudgeServiceImpl implements JudgeService {
                 .inputList(inputList)
                 .build();
         ExecuteCodeResponse executeCodeResponse = codeSandboxProxy.executeCode(executeCodeRequest);
+        List<String> outputList = executeCodeResponse.getOutputList();
+        JudgeInfo judgeInfo = executeCodeResponse.getJudgeInfo();
+
+        JudgeContext judgeContext = new JudgeContext();
+        judgeContext.setJudgeInfo(judgeInfo);
+        judgeContext.setInputList(inputList);
+        judgeContext.setOutputList(outputList);
+        judgeContext.setJudgeCaseList(judgeCaseList);
+        judgeContext.setQuestion(question);
+        judgeContext.setQuestionSubmit(questionSubmit);
 
         // 根据题目结果判断执行是否正确
-        JudgeInfoMessageEnum judgeInfoMessageEnum = JudgeInfoMessageEnum.WAITING;
-        List<String> outputList = executeCodeResponse.getOutputList();
-        if (inputList.size() != outputList.size()) {
-            judgeInfoMessageEnum = JudgeInfoMessageEnum.WRONG_ANSWER;
-            return null;
+        JudgeInfo doJudge = judgeManager.doJudge(judgeContext);
+
+        questionSubmitUpdate.setStatus(QuestionSubmitStatusEnum.SUCCESS.getValue());
+        questionSubmitUpdate.setId(id);
+        questionSubmitUpdate.setJudgeInfo(JSONUtil.toJsonStr(doJudge));
+        boolean update = questionSubmitService.updateById(questionSubmitUpdate);
+        if (!update) {
+            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "题目状态更新错误");
         }
 
-        // 判断输入与输出是否相等
-        for (int i = 0; i < judgeCaseList.size(); i++) {
-            if (!judgeCaseList.get(i).getOutput().equals(outputList.get(i))) {
-                judgeInfoMessageEnum = JudgeInfoMessageEnum.WRONG_ANSWER;
-                return null;
-            }
-        }
-
-        // 判断题目限制
-        String judgeConfigStr = question.getJudgeConfig();
-        JudgeInfo judgeInfo = executeCodeResponse.getJudgeInfo();
-        String message = judgeInfo.getMessage();
-        Long userLimitTime = judgeInfo.getTime();
-        Long userLimitMemory = judgeInfo.getMemory();
-        JudgeConfig judgeConfig = JSONUtil.toBean(judgeConfigStr, JudgeConfig.class);
-        Long systemTimeLimit = judgeConfig.getTimeLimit();
-        Long systemMemoryLimit = judgeConfig.getMemoryLimit();
-        if (userLimitMemory > systemMemoryLimit) {
-            judgeInfoMessageEnum = JudgeInfoMessageEnum.MEMORY_LIMIT_EXCEEDED;
-            return null;
-        }
-
-        if (userLimitTime > systemTimeLimit) {
-            judgeInfoMessageEnum = JudgeInfoMessageEnum.TIME_LIMIT_EXCEEDED;
-            return null;
-        }
-        return null;
+        QuestionSubmit submit = questionSubmitService.getById(questionId);
+        return submit;
     }
 }
