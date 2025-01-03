@@ -4,7 +4,7 @@ import com.wusihao.monkeyoj.job.judge.strategy.DefaultJudgeStrategy;
 import com.wusihao.monkeyoj.job.judge.strategy.JavaJudgeStrategy;
 import com.wusihao.monkeyoj.job.judge.strategy.JudgeContext;
 import com.wusihao.monkeyoj.job.judge.strategy.JudgeStrategy;
-import com.wusihao.monkeyoj.model.dto.questionsubmit.JudgeInfo;
+import com.wusihao.monkeyoj.job.judge.codesandbox.model.JudgeInfo;
 import com.wusihao.monkeyoj.model.entity.QuestionSubmit;
 import com.wusihao.monkeyoj.model.enums.QuestionSubmitLanguageEnum;
 import org.springframework.stereotype.Service;

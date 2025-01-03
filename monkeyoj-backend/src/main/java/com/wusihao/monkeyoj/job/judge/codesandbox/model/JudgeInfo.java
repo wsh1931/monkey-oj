@@ -1,4 +1,4 @@
-package com.wusihao.monkeyoj.model.dto.questionsubmit;
+package com.wusihao.monkeyoj.job.judge.codesandbox.model;
 
 import lombok.Data;
 

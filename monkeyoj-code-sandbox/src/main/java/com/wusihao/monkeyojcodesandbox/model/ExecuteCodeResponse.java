@@ -1,4 +1,4 @@
-package com.wusihao.monkeyoj.job.judge.codesandbox.model;
+package com.wusihao.monkeyojcodesandbox.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

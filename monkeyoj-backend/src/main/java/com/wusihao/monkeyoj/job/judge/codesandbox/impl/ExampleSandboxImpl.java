@@ -3,7 +3,7 @@ package com.wusihao.monkeyoj.job.judge.codesandbox.impl;
 import com.wusihao.monkeyoj.job.judge.codesandbox.CodeSandbox;
 import com.wusihao.monkeyoj.job.judge.codesandbox.model.ExecuteCodeRequest;
 import com.wusihao.monkeyoj.job.judge.codesandbox.model.ExecuteCodeResponse;
-import com.wusihao.monkeyoj.model.dto.questionsubmit.JudgeInfo;
+import com.wusihao.monkeyoj.job.judge.codesandbox.model.JudgeInfo;
 import com.wusihao.monkeyoj.model.enums.JudgeInfoMessageEnum;
 import com.wusihao.monkeyoj.model.enums.QuestionSubmitStatusEnum;
 

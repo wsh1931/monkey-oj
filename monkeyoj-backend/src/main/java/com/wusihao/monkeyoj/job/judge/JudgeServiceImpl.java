@@ -10,7 +10,7 @@ import com.wusihao.monkeyoj.job.judge.codesandbox.model.ExecuteCodeRequest;
 import com.wusihao.monkeyoj.job.judge.codesandbox.model.ExecuteCodeResponse;
 import com.wusihao.monkeyoj.job.judge.strategy.JudgeContext;
 import com.wusihao.monkeyoj.model.dto.question.JudgeCase;
-import com.wusihao.monkeyoj.model.dto.questionsubmit.JudgeInfo;
+import com.wusihao.monkeyoj.job.judge.codesandbox.model.JudgeInfo;
 import com.wusihao.monkeyoj.model.entity.Question;
 import com.wusihao.monkeyoj.model.entity.QuestionSubmit;
 import com.wusihao.monkeyoj.model.enums.QuestionSubmitStatusEnum;

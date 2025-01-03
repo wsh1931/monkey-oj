@@ -3,7 +3,7 @@ package com.wusihao.monkeyoj.job.judge.strategy;
 import cn.hutool.json.JSONUtil;
 import com.wusihao.monkeyoj.model.dto.question.JudgeCase;
 import com.wusihao.monkeyoj.model.dto.question.JudgeConfig;
-import com.wusihao.monkeyoj.model.dto.questionsubmit.JudgeInfo;
+import com.wusihao.monkeyoj.job.judge.codesandbox.model.JudgeInfo;
 import com.wusihao.monkeyoj.model.entity.Question;
 import com.wusihao.monkeyoj.model.enums.JudgeInfoMessageEnum;
 

@@ -1,6 +1,6 @@
 package com.wusihao.monkeyoj.job.judge.strategy;
 
-import com.wusihao.monkeyoj.model.dto.questionsubmit.JudgeInfo;
+import com.wusihao.monkeyoj.job.judge.codesandbox.model.JudgeInfo;
 
 /**
  * @author: wusihao
