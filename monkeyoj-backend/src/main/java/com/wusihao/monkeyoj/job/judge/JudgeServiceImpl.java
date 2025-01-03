@@ -78,8 +78,8 @@ public class JudgeServiceImpl implements JudgeService {
         CodeSandboxProxy codeSandboxProxy = new CodeSandboxProxy(codeSandbox);
         String language = questionSubmit.getLanguage();
         String code = questionSubmit.getCode();
+
         // 获取输入用例
-        // todo 为什么从question中获取输入，不应该是从questionSubmit中获取输入吗
         String judgeCase = question.getJudgeCase();
         List<JudgeCase> judgeCaseList = JSONUtil.toList(judgeCase, JudgeCase.class);
         List<String> inputList = judgeCaseList.stream().map(JudgeCase::getInput).collect(Collectors.toList());
@@ -101,7 +101,7 @@ public class JudgeServiceImpl implements JudgeService {
         judgeContext.setQuestion(question);
         judgeContext.setQuestionSubmit(questionSubmit);
 
-        // 根据题目结果判断执行是否正确
+        // 使用策略模式: 根据题目结果判断执行是否正确
         JudgeInfo doJudge = judgeManager.doJudge(judgeContext);
 
         questionSubmitUpdate.setStatus(QuestionSubmitStatusEnum.SUCCESS.getValue());

@@ -35,7 +35,12 @@ const props = withDefaults(defineProps<Props>(), {
 watch(
   () => props.language,
   () => {
-    coderUpdate();
+    if (codeEditor.value) {
+      monaco.editor.setModelLanguage(
+        toRaw(codeEditor.value).getModel(),
+        props.language
+      );
+    }
   }
 );
 
@@ -50,16 +55,6 @@ onMounted(() => {
     return; // 如果编辑器容器不存在，则直接返回
   }
 
-  coderUpdate();
-  // 监听编辑器内容变化事件，并调用props中的handleChange回调
-  codeEditor.value.onDidChangeModelContent(() => {
-    // 使用getValue方法获取当前编辑器内容，并调用handleChange回调
-    // 注意：这里同样不需要toRaw，因为codeEditor.value已经是原始编辑器实例
-    props.handleChange(toRaw(codeEditor.value!).getValue()); // 使用非空断言操作符!，因为我们知道在onMounted钩子中codeEditor.value已经被赋值
-  });
-});
-
-const coderUpdate = () => {
   // 使用Monaco编辑器的create方法创建编辑器实例，并传入配置选项
   codeEditor.value = monaco.editor.create(codeEditorRef.value, {
     value: props.value, // 设置编辑器初始内容
@@ -72,7 +67,14 @@ const coderUpdate = () => {
     readOnly: false, // 设置编辑器为可编辑状态
     theme: "vs-dark", // 设置编辑器主题为暗色主题
   });
-};
+
+  // 监听编辑器内容变化事件，并调用props中的handleChange回调
+  codeEditor.value.onDidChangeModelContent(() => {
+    // 使用getValue方法获取当前编辑器内容，并调用handleChange回调
+    // 注意：这里同样不需要toRaw，因为codeEditor.value已经是原始编辑器实例
+    props.handleChange(toRaw(codeEditor.value!).getValue()); // 使用非空断言操作符!，因为我们知道在onMounted钩子中codeEditor.value已经被赋值
+  });
+});
 
 // // 定义一个函数，用于填充编辑器内容（当前被注释掉未使用）
 // const fillValue = () => {
