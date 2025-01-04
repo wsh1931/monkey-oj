@@ -2,7 +2,6 @@ package com.wusihao.monkeyojcodesandbox.utils;
 
 import cn.hutool.core.util.StrUtil;
 import com.wusihao.monkeyojcodesandbox.model.ExecuteMessage;
-import org.springframework.util.StopWatch;
 
 import java.io.*;
 
@@ -24,8 +23,6 @@ public class ProcessUtils {
     public static ExecuteMessage runProcessAndGetMessage(Process runProcess, String opName) {
         ExecuteMessage executeMessage = new ExecuteMessage();
         try {
-            StopWatch stopWatch = new StopWatch();
-            stopWatch.start();
             // 等待程序执行完成，获得错误码
             int exitValue = runProcess.waitFor();
             executeMessage.setExitValue(exitValue);
@@ -52,10 +49,6 @@ public class ProcessUtils {
                 executeMessage.setErrorMessage(errorCompileOutputStringBuilder.toString());
                 System.err.println(errorCompileOutputStringBuilder);
             }
-            // 得到开始到结束的执行时间
-            stopWatch.stop();
-            executeMessage.setTime(stopWatch.getLastTaskTimeMillis());
-            stopWatch.getLastTaskTimeMillis();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
