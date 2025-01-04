@@ -3,7 +3,6 @@ package com.wusihao.monkeyojcodesandbox;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.resource.ResourceUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.dfa.FoundWord;
 import cn.hutool.dfa.WordTree;
 import com.wusihao.monkeyojcodesandbox.model.ExecuteCodeRequest;
 import com.wusihao.monkeyojcodesandbox.model.ExecuteCodeResponse;
@@ -31,19 +30,31 @@ public class JavaNativeCodeSandboxImpl implements CodeSandbox {
 
     public static final long TIME_OUT = 5000L;
 
+    public static final String SECURITY_MANAGE_PATH = "D:\\JAVA\\project\\monkey-oj\\monkeyoj-code-sandbox\\src\\main\\resources\\security";
+
+    public static final String SECURITY_MANAGE_CLASS_NAME = "MySecurityManager";
+
     public static final List<String> blackList = Arrays.asList("File", "exec");
+
+    private static final WordTree WORD_TREE;
+
+    static {
+        // 初始化字典树
+        WORD_TREE = new WordTree();
+        WORD_TREE.addWords(blackList);
+    }
 
     public static void main(String[] args) {
         ExecuteCodeRequest executeCodeRequest = new ExecuteCodeRequest();
         executeCodeRequest.setInputList(Arrays.asList("1 2", "1 3"));
         executeCodeRequest.setLanguage("java");
 //        String readStr = ResourceUtil.readStr("testCode/simpleComputeArgs/Main.java", StandardCharsets.UTF_8);
-//        String readStr = ResourceUtil.readStr("testCode/simpleCompute/Main.java", StandardCharsets.UTF_8);
+        String readStr = ResourceUtil.readStr("testCode/simpleCompute/Main.java", StandardCharsets.UTF_8);
 //        String readStr = ResourceUtil.readStr("testCode/unsafeCode/SleepError.java", StandardCharsets.UTF_8);
 //        String readStr = ResourceUtil.readStr("testCode/unsafeCode/MemoryError.java", StandardCharsets.UTF_8);
 //        String readStr = ResourceUtil.readStr("testCode/unsafeCode/ReadFileError.java", StandardCharsets.UTF_8);
 //        String readStr = ResourceUtil.readStr("testCode/unsafeCode/WriteFileError.java", StandardCharsets.UTF_8);
-        String readStr = ResourceUtil.readStr("testCode/unsafeCode/RunFileError.java", StandardCharsets.UTF_8);
+//        String readStr = ResourceUtil.readStr("testCode/unsafeCode/RunFileError.java", StandardCharsets.UTF_8);
         executeCodeRequest.setCode(readStr);
 
         JavaNativeCodeSandboxImpl javaNativeCodeSandbox = new JavaNativeCodeSandboxImpl();
@@ -52,18 +63,18 @@ public class JavaNativeCodeSandboxImpl implements CodeSandbox {
 
     @Override
     public ExecuteCodeResponse executeCode(ExecuteCodeRequest executeCodeRequest) {
+//        System.setSecurityManager(new DefaultSecurityManager());
+//        System.setSecurityManager(new DenySecurityManager());
         String language = executeCodeRequest.getLanguage();
         String code = executeCodeRequest.getCode();
 
-        // 用字段树校验代码是否合规
-        WordTree wordTree = new WordTree();
-        wordTree.addWords(blackList);
-        FoundWord foundWord = wordTree.matchWord(code);
-        // 若存在违规代码
-        if (foundWord != null) {
-            System.out.println(foundWord.getFoundWord());
-            return null;
-        }
+        //  校验代码中是否包含黑名单中的禁用词
+//        FoundWord foundWord = WORD_TREE.matchWord(code);
+//        if (foundWord != null) {
+//            System.out.println("包含禁止词：" + foundWord.getFoundWord());
+//            return null;
+//        }
+
         // 得到当前项目更目录
         String userDir = System.getProperty("user.dir");
         // 得到tempCode路径，使用File.separator分隔开是因为在linux/windows中的路径分隔符不一样
@@ -97,8 +108,10 @@ public class JavaNativeCodeSandboxImpl implements CodeSandbox {
         List<String> inputList = executeCodeRequest.getInputList();
         List<ExecuteMessage> executeMessageList = new ArrayList<>();
         for (String inputArgs: inputList) {
+            // java -Dfile.encoding=UTF-8 -cp %s;%s -Djava.security.manager=MySecurityManager Main
             String runCmd = String.format("java -Xmx256m -Dfile.encoding=UTF-8 -cp %s Main %s", userCodeParentPath, inputArgs);
-
+            // 不推荐在Java9中实现
+//            String runCmd = String.format("java -Xmx256m -Dfile.encoding=UTF-8 -cp %s;%s -Djava.security.manager=%s Main %s", userCodeParentPath, SECURITY_MANAGE_PATH, SECURITY_MANAGE_CLASS_NAME, inputArgs);
             try {
                 // 计算时间
                 StopWatch stopWatch = new StopWatch();
