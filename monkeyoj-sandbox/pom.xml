@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.wusihao</groupId>
-    <artifactId>monkeyoj-code-sandbox</artifactId>
+    <artifactId>monkeyoj-sandbox</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>monkeyoj-code-sandbox</name>
-    <description>monkeyoj-code-sandbox</description>
+    <name>monkeyoj-sandbox</name>
+    <description>monkeyoj-sandbox</description>
 <!--    <url/>-->
 <!--    <licenses>-->
 <!--        <license/>-->

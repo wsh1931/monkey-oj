@@ -19,7 +19,7 @@ public class MySecurityManager extends SecurityManager{
     @Override
     public void checkRead(String file) {
         System.out.println(file);
-        if(file.contains("D:\\xiang-mu-he-ji\\OJ\\monkeyoj-code-sandbox")){
+        if(file.contains("D:\\xiang-mu-he-ji\\OJ\\monkeyoj-sandbox")){
             return;
         }
         //        throw new SecurityException("checkRead 权限异常:"+file);

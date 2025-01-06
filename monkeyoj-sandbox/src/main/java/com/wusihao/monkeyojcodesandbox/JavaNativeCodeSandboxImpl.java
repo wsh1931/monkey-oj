@@ -30,7 +30,7 @@ public class JavaNativeCodeSandboxImpl implements CodeSandbox {
 
     public static final long TIME_OUT = 5000L;
 
-    public static final String SECURITY_MANAGE_PATH = "D:\\JAVA\\project\\monkey-oj\\monkeyoj-code-sandbox\\src\\main\\resources\\security";
+    public static final String SECURITY_MANAGE_PATH = "D:\\JAVA\\project\\monkey-oj\\monkeyoj-sandbox\\src\\main\\resources\\security";
 
     public static final String SECURITY_MANAGE_CLASS_NAME = "MySecurityManager";
 
