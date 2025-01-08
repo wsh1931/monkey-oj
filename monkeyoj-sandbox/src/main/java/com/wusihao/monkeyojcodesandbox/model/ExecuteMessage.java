@@ -11,4 +11,5 @@ public class ExecuteMessage {
     private String message;
     private String errorMessage;
     private Long time;
+    private Long memory;
 }

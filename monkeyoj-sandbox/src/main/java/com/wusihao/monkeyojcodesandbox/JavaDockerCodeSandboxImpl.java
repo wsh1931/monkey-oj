@@ -1,9 +1,12 @@
 package com.wusihao.monkeyojcodesandbox;
 
+import cn.hutool.core.date.StopWatch;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.resource.ResourceUtil;
 import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.StrUtil;
 import com.github.dockerjava.api.DockerClient;
+import com.github.dockerjava.api.async.ResultCallback;
 import com.github.dockerjava.api.command.*;
 import com.github.dockerjava.api.model.*;
 import com.github.dockerjava.core.DockerClientBuilder;
@@ -14,7 +17,9 @@ import com.wusihao.monkeyojcodesandbox.model.ExecuteMessage;
 import com.wusihao.monkeyojcodesandbox.model.JudgeInfo;
 import com.wusihao.monkeyojcodesandbox.utils.ProcessUtils;
 
+import java.io.Closeable;
 import java.io.File;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -43,7 +48,7 @@ public class JavaDockerCodeSandboxImpl implements CodeSandbox {
 
     public static void main(String[] args) {
         ExecuteCodeRequest executeCodeRequest = new ExecuteCodeRequest();
-        executeCodeRequest.setInputList(Arrays.asList("1 2", "1 3"));
+        executeCodeRequest.setInputList(Arrays.asList("1 2", "1 3", "1 5"));
         executeCodeRequest.setLanguage("java");
         String readStr = ResourceUtil.readStr("testCode/simpleComputeArgs/Main.java", StandardCharsets.UTF_8);
 //        String readStr = ResourceUtil.readStr("testCode/simpleCompute/Main.java", StandardCharsets.UTF_8);
@@ -145,9 +150,16 @@ public class JavaDockerCodeSandboxImpl implements CodeSandbox {
 //        //启动容器
         dockerClient.startContainerCmd(containerId).exec();
         //执行命令并获取结果
-        ArrayList<ExecuteMessage> executeMessageList = new ArrayList<>();
-        // 创建执行命令
+        List<ExecuteMessage> executeMessageList = new ArrayList<>();
+        // 创建执行命令并获取结果 java -Xmx256m -Dfile.encoding=UTF-8 -cp %s Main %s
+
         for (String inputArgs : inputList) {
+            try {
+                // 防止内存监督程序监督不到
+                Thread.sleep(500L);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
             String[] inputArgsArray = inputArgs.split(" ");
             String[] cmdArray = ArrayUtil.append(new String[]{"java", "-cp", "/app", "Main"}, inputArgsArray);
             ExecCreateCmdResponse execCreateCmdResponse = dockerClient.execCreateCmd(containerId)
@@ -158,33 +170,119 @@ public class JavaDockerCodeSandboxImpl implements CodeSandbox {
                     .exec();
             System.out.println("创建执行命令：" + execCreateCmdResponse);
 
-            // 执行命令
+            // 返回结果
+            ExecuteMessage executeMessage = new ExecuteMessage();
+            final String[] message = { null };
+            final String[] errorMessage = { null };
+            long time = 0L;
+            // 定义执行命令返回结果
             String execId = execCreateCmdResponse.getId();
             ExecStartResultCallback execStartResultCallback = new ExecStartResultCallback() {
                 @Override
                 public void onNext(Frame frame) {
                     StreamType streamType = frame.getStreamType();
                     if (StreamType.STDERR.equals(streamType)) {
-                        System.err.println("输出结果错误: " + new String(frame.getPayload()));
+                        errorMessage[0] = new String(frame.getPayload());
+                        System.err.println("输出结果错误: " + errorMessage[0]);
                     } else {
-                        System.out.println("输出结果正确: " + new String(frame.getPayload()));
+                        message[0] = new String(frame.getPayload());
+                        System.out.println("输出结果正确: " + message[0]);
                     }
                     super.onNext(frame);
                 }
             };
 
+            final long[] maxMemory = {0};
+            // 获取程序占用内存
+            StatsCmd statsCmd = dockerClient.statsCmd(containerId);
+            ResultCallback<Statistics> statisticsResultCallback = new ResultCallback<Statistics>() {
+                @Override
+                public void onNext(Statistics statistics) {
+                    Long maxUsage = statistics.getMemoryStats().getMaxUsage();
+                    maxMemory[0] = Math.max(maxMemory[0], maxUsage);
+                    System.out.println("最大内存占用："+ maxMemory[0]);
+                }
+
+                @Override
+                public void onStart(Closeable closeable) {
+
+                }
+
+                @Override
+                public void onError(Throwable throwable) {
+
+                }
+
+                @Override
+                public void onComplete() {
+
+                }
+
+                @Override
+                public void close() throws IOException {
+
+                }
+            };
+            statsCmd.exec(statisticsResultCallback);
             try {
+                // 执行命令
+                StopWatch stopWatch = new StopWatch();
+                stopWatch.start();
                 dockerClient.execStartCmd(execId)
                         .exec(execStartResultCallback)
                         .awaitCompletion();
+                stopWatch.stop();
+                time = stopWatch.getLastTaskTimeMillis();
+                executeMessage.setTime(time);
+                statsCmd.close();
             } catch (InterruptedException e) {
                 System.err.println("程序执行异常");
                 throw new RuntimeException(e);
             }
+
+            executeMessage.setMessage(message[0]);
+            executeMessage.setErrorMessage(errorMessage[0]);
+
+            executeMessage.setMemory(maxMemory[0]);
+            executeMessageList.add(executeMessage);
         }
 
 
-        return new ExecuteCodeResponse();
+        // 收集整理输出结果
+        ExecuteCodeResponse executeCodeResponse = new ExecuteCodeResponse();
+        List<String> outPutList = new ArrayList<>();
+        long maxTime = 0;
+        for (ExecuteMessage executeMessage : executeMessageList) {
+            String errorMessage = executeMessage.getErrorMessage();
+            if (StrUtil.isNotBlank(errorMessage)) {
+                // 执行结果存在错误
+                executeCodeResponse.setMessage(errorMessage);
+                executeCodeResponse.setStatus(3);
+                break;
+            }
+            outPutList.add(executeMessage.getMessage());
+            Long executeMessageTime = executeMessage.getTime();
+            // 得到运行最大时间
+            if (executeMessageTime != null) {
+                maxTime = Math.max(maxTime, executeMessageTime);
+            }
+        }
+
+        if (outPutList.size() == executeMessageList.size()) {
+            executeCodeResponse.setStatus(1);
+        }
+
+        executeCodeResponse.setOutputList(outPutList);
+        JudgeInfo judgeInfo = new JudgeInfo();
+        judgeInfo.setTime(maxTime);
+        executeCodeResponse.setJudgeInfo(judgeInfo);
+
+        // 执行完代码后，文件清理
+        if (userCodeFile.getParentFile() != null) {
+            boolean del = FileUtil.del(userCodeParentPath);
+            System.out.println("删除" + (del ? "成功": "失败"));
+        }
+        return executeCodeResponse;
     }
 
     /**
