@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author: wusihao
@@ -131,13 +132,20 @@ public class JavaDockerCodeSandboxImpl implements CodeSandbox {
         hostConfig
                 // 设置容器内存
                 .withMemory(100 * 1000 * 1000L)
+                .withMemorySwap(0L)
                 // 设置容器cpu数目
                 .withCpuCount(1L)
+//                linux自带安全管理配置
+//                .withSecurityOpts(Arrays.asList("seccomp=安全管理配置字符串"))
                 // 将文件 userCodePath 挂载到容器的/app目录下
                 .setBinds(new Bind(userCodeParentPath, new Volume("/app")));
 
         // 获取输入，并且得到终端的输出
         CreateContainerResponse createContainerResponse = containerCmd
+                // 限制用户不能向根目录写文件
+                .withReadonlyRootfs(true)
+                // 禁止外部网络的请求
+                .withNetworkDisabled(true)
                 .withAttachStdin(true)
                 .withAttachStdout(true)
                 .withAttachStderr(true)
@@ -175,6 +183,7 @@ public class JavaDockerCodeSandboxImpl implements CodeSandbox {
             final String[] message = { null };
             final String[] errorMessage = { null };
             long time = 0L;
+            final boolean[] timeout = {true};
             // 定义执行命令返回结果
             String execId = execCreateCmdResponse.getId();
             ExecStartResultCallback execStartResultCallback = new ExecStartResultCallback() {
@@ -189,6 +198,13 @@ public class JavaDockerCodeSandboxImpl implements CodeSandbox {
                         System.out.println("输出结果正确: " + message[0]);
                     }
                     super.onNext(frame);
+                }
+
+                // 若在规定时间内完成则会执行此方法，说明该程序超时
+                @Override
+                public void onComplete() {
+                    timeout[0] = false;
+                    super.onComplete();
                 }
             };
 
@@ -223,18 +239,19 @@ public class JavaDockerCodeSandboxImpl implements CodeSandbox {
 
                 }
             };
-            statsCmd.exec(statisticsResultCallback);
             try {
                 // 执行命令
                 StopWatch stopWatch = new StopWatch();
+                statsCmd.exec(statisticsResultCallback);
                 stopWatch.start();
                 dockerClient.execStartCmd(execId)
                         .exec(execStartResultCallback)
-                        .awaitCompletion();
+                        // 超时后会继续执行，不会执行 onComplete 方法
+                        .awaitCompletion(TIME_OUT, TimeUnit.MILLISECONDS);
                 stopWatch.stop();
+                statsCmd.close();
                 time = stopWatch.getLastTaskTimeMillis();
                 executeMessage.setTime(time);
-                statsCmd.close();
             } catch (InterruptedException e) {
                 System.err.println("程序执行异常");
                 throw new RuntimeException(e);
