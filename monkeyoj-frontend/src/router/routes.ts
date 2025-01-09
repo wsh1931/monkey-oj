@@ -11,6 +11,7 @@ import AddQuestionView from "@/views/question/AddQuestionView.vue";
 import ManageQuestionView from "@/views/question/ManageQuestionView.vue";
 import QuestionListView from "@/views/question/QuestionListView.vue";
 import QuestionDetailView from "@/views/question/QuestionDetailView.vue";
+import QuestionSubmitView from "@/views/question/QuestionSubmitView.vue";
 
 export const routes: Array<RouteRecordRaw> = [
   {
@@ -61,6 +62,11 @@ export const routes: Array<RouteRecordRaw> = [
       access: AUTHORITY_ENUM.USER,
       hideInMenu: true,
     },
+  },
+  {
+    path: "/question/submit",
+    name: "提交题目列表",
+    component: QuestionSubmitView,
   },
   {
     path: "/question/manage",

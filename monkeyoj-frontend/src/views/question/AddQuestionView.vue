@@ -129,10 +129,10 @@ const loadData = async () => {
   );
   if (res.code === 0) {
     form.value = res.data as any;
-    if (form.value.judgeCase) {
+    if (!form.value.judgeCase) {
       form.value.judgeCase = [];
     } else {
-      form.value.judgeCase = JSON.parse(form.value.judgeCase);
+      form.value.judgeCase = JSON.parse(form.value.judgeCase as any);
     }
     if (!form.value.judgeConfig) {
       form.value.judgeConfig = {

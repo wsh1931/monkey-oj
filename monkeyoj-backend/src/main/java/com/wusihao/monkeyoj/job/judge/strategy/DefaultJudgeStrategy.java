@@ -8,6 +8,7 @@ import com.wusihao.monkeyoj.model.entity.Question;
 import com.wusihao.monkeyoj.model.enums.JudgeInfoMessageEnum;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author: wusihao
@@ -28,8 +29,8 @@ public class DefaultJudgeStrategy implements JudgeStrategy {
     public JudgeInfo doJudge(JudgeContext judgeContext) {
         // 根据题目结果判断执行是否正确
         JudgeInfo judgeInfo = judgeContext.getJudgeInfo();
-        Long userLimitTime = judgeInfo.getTime();
-        Long userLimitMemory = judgeInfo.getMemory();
+        Long userLimitTime = Optional.ofNullable(judgeInfo.getTime()).orElse(0L);
+        Long userLimitMemory = Optional.ofNullable(judgeInfo.getMemory()).orElse(0L);
         JudgeInfo judgeInfoResponse = new JudgeInfo();
 
         JudgeInfoMessageEnum judgeInfoMessageEnum = JudgeInfoMessageEnum.ACCEPT;

@@ -70,7 +70,6 @@
 import {
   QuestionControllerService,
   QuestionSubmitAddRequest,
-  QuestionSubmitControllerService,
   QuestionVO,
 } from "../../../generated";
 import { onMounted, ref, withDefaults, defineProps } from "vue";
@@ -115,7 +114,7 @@ const doSubmit = async () => {
   if (!question.value?.id) {
     return;
   }
-  const res = await QuestionSubmitControllerService.doSubmitQuestionUsingPost({
+  const res = await QuestionControllerService.doSubmitQuestionUsingPost({
     ...form.value,
     questionId: question.value.id,
   });
