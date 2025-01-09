@@ -2,6 +2,7 @@ package com.wusihao.monkeyojcodesandbox;
 
 import com.wusihao.monkeyojcodesandbox.model.ExecuteCodeRequest;
 import com.wusihao.monkeyojcodesandbox.model.ExecuteCodeResponse;
+import org.springframework.stereotype.Service;
 
 /**
  * @author: wusihao
@@ -9,7 +10,8 @@ import com.wusihao.monkeyojcodesandbox.model.ExecuteCodeResponse;
  * @version: 1.0
  * @description: Java代码沙箱原生实现，直接复用模板方法
  */
-public class JavaNativeCodeSandbox extends JavaCodeSandboxTemplate {
+@Service
+public class JavaNativeCodeSandboxImpl extends JavaCodeSandboxTemplate {
     /**
      * 若重写则调用重写的方法，若不重写则默认调用JavaCodeSandboxTemplate方法
      *

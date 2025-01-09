@@ -2,8 +2,11 @@ package com.wusihao.monkeyojcodesandbox.utils;
 
 import cn.hutool.core.util.StrUtil;
 import com.wusihao.monkeyojcodesandbox.model.ExecuteMessage;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author: wusihao
@@ -30,24 +33,36 @@ public class ProcessUtils {
                 System.out.println(opName + "成功");
                 // 得到控制台的打印信息
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(runProcess.getInputStream()));
-                StringBuilder compileOutputStringBuilder = new StringBuilder();
+                List<String> outputStrList = new ArrayList<>();
                 String compileOutputLine;
                 while ((compileOutputLine = bufferedReader.readLine()) != null) {
-                    compileOutputStringBuilder.append(compileOutputLine.toString());
+                    outputStrList.add(compileOutputLine);
                 }
-                executeMessage.setMessage(compileOutputStringBuilder.toString());
-                System.out.println(compileOutputStringBuilder);
+
+                executeMessage.setMessage(StringUtils.join(outputStrList, "\n"));
             } else {
-                System.out.println(opName + "失败, 错误码: " + exitValue);
-                // 得到控制台的错误流信息
-                BufferedReader errorBufferedReader = new BufferedReader(new InputStreamReader(runProcess.getErrorStream()));
-                StringBuilder errorCompileOutputStringBuilder = new StringBuilder();
-                String errorCompileOutputLine;
-                while ((errorCompileOutputLine = errorBufferedReader.readLine()) != null) {
-                    errorCompileOutputStringBuilder.append(errorCompileOutputLine);
+                //异常退出
+                System.out.println(opName+"失败，错误码" + exitValue);
+                //分批获取进程的正常输出
+                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(runProcess.getInputStream()));
+                List<String>outputList=new ArrayList<>();
+                //逐行读取
+                String compileOutputLine;
+                while((compileOutputLine= bufferedReader.readLine()) != null){
+                    outputList.add(compileOutputLine);
                 }
-                executeMessage.setErrorMessage(errorCompileOutputStringBuilder.toString());
-                System.err.println(errorCompileOutputStringBuilder);
+                executeMessage.setMessage(StringUtils.join(outputList,"\n"));
+                //分批获取进程的错误输出
+                BufferedReader errorBufferedReader = new BufferedReader(new InputStreamReader(runProcess.getErrorStream()));
+
+                //逐行读取
+                List<String>errorOutputList = new ArrayList<>();
+                //逐行读取
+                String errorCompileOutputLine;
+                while((errorCompileOutputLine= errorBufferedReader.readLine()) != null){
+                    errorOutputList.add(errorCompileOutputLine);
+                }
+                executeMessage.setErrorMessage(StringUtils.join(errorOutputList,"\n"));
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
