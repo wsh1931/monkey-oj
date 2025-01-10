@@ -1,8 +1,11 @@
 package com.wusihao.monkeyoj.job.judge.codesandbox;
 
-import com.wusihao.monkeyoj.job.judge.codesandbox.impl.ExampleSandboxImpl;
-import com.wusihao.monkeyoj.job.judge.codesandbox.model.ExecuteCodeRequest;
-import com.wusihao.monkeyoj.job.judge.codesandbox.model.ExecuteCodeResponse;
+import com.wusihao.monkeyoj.judge.codesandbox.CodeSandbox;
+import com.wusihao.monkeyoj.judge.codesandbox.CodeSandboxFactory;
+import com.wusihao.monkeyoj.judge.codesandbox.CodeSandboxProxy;
+import com.wusihao.monkeyoj.judge.codesandbox.impl.ExampleSandboxImpl;
+import com.wusihao.monkeyoj.judge.codesandbox.model.ExecuteCodeRequest;
+import com.wusihao.monkeyoj.judge.codesandbox.model.ExecuteCodeResponse;
 import com.wusihao.monkeyoj.model.enums.QuestionSubmitLanguageEnum;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

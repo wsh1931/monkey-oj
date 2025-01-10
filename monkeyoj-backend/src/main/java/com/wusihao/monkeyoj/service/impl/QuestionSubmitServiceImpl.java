@@ -7,7 +7,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.wusihao.monkeyoj.common.ErrorCode;
 import com.wusihao.monkeyoj.constant.CommonConstant;
 import com.wusihao.monkeyoj.exception.BusinessException;
-import com.wusihao.monkeyoj.job.judge.JudgeService;
+import com.wusihao.monkeyoj.judge.JudgeService;
 import com.wusihao.monkeyoj.mapper.QuestionSubmitMapper;
 import com.wusihao.monkeyoj.model.dto.questionsubmit.QuestionSubmitAddRequest;
 import com.wusihao.monkeyoj.model.dto.questionsubmit.QuestionSubmitQueryRequest;
