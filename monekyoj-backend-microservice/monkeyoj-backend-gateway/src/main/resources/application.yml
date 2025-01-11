@@ -1,6 +1,25 @@
 spring:
   cloud:
     nacos:
-      server-addr: 127.0.0.1:8848
+      discovery:
+        server-addr: 127.0.0.1:8848
+    gateway:
+      routes:
+        - id: monkeyoj-backend-user-service
+          uri: lb://monkeyoj-backend-user-service
+          predicates:
+            - Path=/api/user/**
+        - id: monkeyoj-backend-question-service
+          uri: lb://monkeyoj-backend-question-service
+          predicates:
+            - Path=/api/question/**
+        - id: monkeyoj-backend-judge-service
+          uri: lb://monkeyoj-backend-judge-service
+          predicates:
+            - Path=/api/judge/**
+  application:
+    name: monkeyoj-backend-gateway
   main:
     web-application-type: reactive
+server:
+  port: 8101
