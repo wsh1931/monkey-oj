@@ -33,7 +33,7 @@ import static com.wusihao.monkeyojbackenduserservice.service.impl.UserServiceImp
  *
  */
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/")
 @Slf4j
 public class UserController {
 

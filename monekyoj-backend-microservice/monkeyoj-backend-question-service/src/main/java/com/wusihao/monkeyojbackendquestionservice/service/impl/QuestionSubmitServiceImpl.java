@@ -15,8 +15,8 @@ import com.wusihao.monkeyojbackendmodel.model.vo.QuestionSubmitVO;
 import com.wusihao.monkeyojbackendquestionservice.mapper.QuestionSubmitMapper;
 import com.wusihao.monkeyojbackendquestionservice.service.QuestionService;
 import com.wusihao.monkeyojbackendquestionservice.service.QuestionSubmitService;
-import com.wusihao.monkeyojbackendserviceclient.service.JudgeService;
-import com.wusihao.monkeyojbackendserviceclient.service.UserService;
+import com.wusihao.monkeyojbackendserviceclient.service.JudgeFeignClient;
+import com.wusihao.monkeyojbackendserviceclient.service.UserFeignClient;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Lazy;
@@ -45,11 +45,11 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
     @Resource
     private QuestionService questionService;
     @Resource
-    private UserService userService;
+    private UserFeignClient userFeignClient;
 
     @Resource
     @Lazy
-    private JudgeService judgeService;
+    private JudgeFeignClient judgeFeignClient;
 
     /**
      * 用户题目提交
@@ -92,7 +92,7 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
         // 执行判题服务
         Long questionSubmitId = questionSubmit.getId();
         CompletableFuture.runAsync(() -> {
-            judgeService.doJudge(questionSubmitId);
+            judgeFeignClient.doJudge(questionSubmitId);
         });
         return questionSubmitId;
     }
@@ -132,7 +132,7 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
         //仅本人和管理员能看见自己的答案
         Long userId = loginUser.getId();
         //处理脱敏
-        if(!Objects.equals(userId, questionSubmit.getUserId()) &&!userService.isAdmin(loginUser)){
+        if(!Objects.equals(userId, questionSubmit.getUserId()) &&!userFeignClient.isAdmin(loginUser)){
             questionSubmitVO.setCode(null);
         }
         return questionSubmitVO;
@@ -147,7 +147,7 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
         }
         // 1. 关联查询用户信息
         Set<Long> userIdSet = questionSubmitList.stream().map(QuestionSubmit::getUserId).collect(Collectors.toSet());
-        Map<Long, List<User>> userIdUserListMap = userService.listByIds(userIdSet).stream()
+        Map<Long, List<User>> userIdUserListMap = userFeignClient.listByIds(userIdSet).stream()
                 .collect(Collectors.groupingBy(User::getId));
         // 填充信息
         List<QuestionSubmitVO> questionSubmitVOList = questionSubmitList.stream().map(questionSubmit -> {
@@ -158,10 +158,10 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
                 user = userIdUserListMap.get(userId).get(0);
             }
             // 非本人或管理员看不到代码
-            if(!Objects.equals(userId, loginUser.getId()) &&!userService.isAdmin(loginUser)){
+            if(!Objects.equals(userId, loginUser.getId()) &&!userFeignClient.isAdmin(loginUser)){
                 questionSubmitVO.setCode(null);
             }
-            questionSubmitVO.setUserVO(userService.getUserVO(user));
+            questionSubmitVO.setUserVO(userFeignClient.getUserVO(user));
             return questionSubmitVO;
         }).collect(Collectors.toList());
         questionSubmitVOPage.setRecords(questionSubmitVOList);
