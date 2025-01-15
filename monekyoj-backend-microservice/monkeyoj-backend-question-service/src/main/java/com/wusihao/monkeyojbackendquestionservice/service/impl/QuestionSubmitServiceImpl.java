@@ -1,6 +1,7 @@
 package com.wusihao.monkeyojbackendquestionservice.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.json.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -13,6 +14,10 @@ import com.wusihao.monkeyojbackendmodel.model.enums.QuestionSubmitLanguageEnum;
 import com.wusihao.monkeyojbackendmodel.model.enums.QuestionSubmitStatusEnum;
 import com.wusihao.monkeyojbackendmodel.model.vo.QuestionSubmitVO;
 import com.wusihao.monkeyojbackendquestionservice.mapper.QuestionSubmitMapper;
+import com.wusihao.monkeyojbackendquestionservice.rabbitmq.EventConstant;
+import com.wusihao.monkeyojbackendquestionservice.rabbitmq.MessageProducerMethods;
+import com.wusihao.monkeyojbackendquestionservice.rabbitmq.RabbitmqExchangeName;
+import com.wusihao.monkeyojbackendquestionservice.rabbitmq.RabbitmqRoutingName;
 import com.wusihao.monkeyojbackendquestionservice.service.QuestionService;
 import com.wusihao.monkeyojbackendquestionservice.service.QuestionSubmitService;
 import com.wusihao.monkeyojbackendserviceclient.service.JudgeFeignClient;
@@ -31,7 +36,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 /**
@@ -50,6 +54,8 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
     @Resource
     @Lazy
     private JudgeFeignClient judgeFeignClient;
+    @Resource
+    private MessageProducerMethods messageProducerMethods;
 
     /**
      * 用户题目提交
@@ -91,9 +97,12 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
 
         // 执行判题服务
         Long questionSubmitId = questionSubmit.getId();
-        CompletableFuture.runAsync(() -> {
-            judgeFeignClient.doJudge(questionSubmitId);
-        });
+        JSONObject data = new JSONObject();
+        data.putOnce("questionSubmitId", questionSubmitId);
+        data.putOnce("event", EventConstant.javaNativeCodeExecute);
+        messageProducerMethods.sendMessage(RabbitmqExchangeName.executeCodeExchange,
+                RabbitmqRoutingName.javaNativeCodeExecuteRouting,
+                data.toString());
         return questionSubmitId;
     }
 
